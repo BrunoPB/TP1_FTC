@@ -13,8 +13,8 @@
 
 DFA loadDfaFromFile(bool* dfaNullFlag);
 void exportDfaToFile(DFA dfa);
-void runOn2Algorithm();
-void runOnLogNAlgorithm();
+DFA minimizeWithON2Algorithm(DFA dfa);
+DFA minimizeWithONLogNAlgorithm(DFA dfa);
 
 int main()
 {
@@ -44,14 +44,14 @@ int main()
                 std::cout << "\nNo DFA loaded yet.\n\n";
                 break;
             }
-            runOn2Algorithm();
+            minimizeWithON2Algorithm(dfa);
             break;
         case 4:
             if (dfaNullFlag) {
                 std::cout << "\nNo DFA loaded yet.\n\n";
                 break;
             }
-            runOnLogNAlgorithm();
+            minimizeWithONLogNAlgorithm(dfa);
             break;
         default:
             quit = true;
@@ -62,6 +62,12 @@ int main()
     return 0;
 }
 
+/**
+ * @brief Loads a DFA from a file
+ * 
+ * @param dfaNullFlag Pointer to a flag that indicates if the DFA is null
+ * @return The DFA loaded from the file
+ */
 DFA loadDfaFromFile(bool* dfaNullFlag) {
     std::cout << "File name to load: ";
     std::string file_name;
@@ -119,6 +125,11 @@ DFA loadDfaFromFile(bool* dfaNullFlag) {
     return dfa;
 }
 
+/**
+ * @brief Exports a DFA to a file
+ * 
+ * @param dfa The DFA to be exported
+ */
 void exportDfaToFile(DFA dfa) {
     std::cout << "File name to export: ";
     std::string file_name;
@@ -181,10 +192,24 @@ void exportDfaToFile(DFA dfa) {
     std::cout << "\nDFA successfully exported to " + file_path + ".\n\n";
 }
 
-void runOn2Algorithm() {
+/**
+ * @brief Runs an O(n^2) algorithm that minimizes a DFA. This algorithm was created by Blum (1996).
+ * 
+ * @param dfa The DFA to be minimized
+ * 
+ * @return The minimized DFA
+ */
+DFA minimizeWithON2Algorithm(DFA dfa) {
     std::cout << "Running O(n^2) Algorithm\n";
 }
 
-void runOnLogNAlgorithm() {
+/**
+ * @brief Runs an O(n log n) algorithm that minimizes a DFA. This algorithm was created by Blum (1996), it is a modification of the O(n^2) algorithm.
+ * 
+ * @param dfa The DFA to be minimized
+ * 
+ * @return The minimized DFA
+ */
+DFA minimizeWithONLogNAlgorithm(DFA dfa) {
     std::cout << "Running O(n log n) Algorithm\n";
 }
