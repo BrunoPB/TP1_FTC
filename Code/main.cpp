@@ -3,10 +3,11 @@
  * @author Felipe Nepomuceno Coelho (689661)
  */
 
-#include "dfa.cpp"
+// #include "dfa.cpp"
 #include <iostream>
 #include "pugixml/pugixml.hpp"
-#include "utils.cpp"
+#include "algorithms.cpp"
+#include <chrono>
 
 // #define BASE_PATH "./../" // Debug path
 #define BASE_PATH "./../../" // Execution path
@@ -15,6 +16,7 @@ DFA loadDfaFromFile(bool* dfaNullFlag);
 void exportDfaToFile(DFA dfa);
 DFA minimizeWithON2Algorithm(DFA dfa);
 DFA minimizeWithONLogNAlgorithm(DFA dfa);
+DFA generateDfa(int n);
 
 int main()
 {
@@ -22,13 +24,11 @@ int main()
     bool dfaNullFlag = true;
     bool quit = false;
 
-    while (!quit)
-    {
-        std::cout << "MENU:\n1. Load DFA file\n2. Export DFA\n3. Run O(n^2) Algorithm\n4. Run O(n log n) Algorithm\n0. Quit\nChoose option: ";
+    while (!quit) {
+        std::cout << "MENU:\n1. Load DFA file\n2. Export DFA\n3. Run O(n^2) Algorithm\n4. Run O(n log n) Algorithm\n5. Generate n states DFA\n0. Quit\nChoose option: ";
         int option;
         std::cin >> option;
-        switch (option)
-        {
+        switch (option) {
         case 1:
             dfa = loadDfaFromFile(&dfaNullFlag);
             break;
@@ -44,14 +44,39 @@ int main()
                 std::cout << "\nNo DFA loaded yet.\n\n";
                 break;
             }
-            minimizeWithON2Algorithm(dfa);
+            try {
+                std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+                dfa = minimizeWithON2Algorithm(dfa);
+                std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+                std::cout << "Total time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "ms\n\n";
+            } catch (const std::exception& e) {
+                std::cerr << e.what() << '\n';
+            }
             break;
-        case 4:
+        case 4: 
             if (dfaNullFlag) {
                 std::cout << "\nNo DFA loaded yet.\n\n";
                 break;
             }
-            minimizeWithONLogNAlgorithm(dfa);
+            try {
+                std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+                dfa = minimizeWithONLogNAlgorithm(dfa);
+                std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+                std::cout << "Total time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "ms\n\n";
+            } catch (const std::exception& e) {
+                std::cerr << e.what() << '\n';
+            }
+            break;
+        case 5:
+            std::cout << "Number of states: ";
+            int n;
+            std::cin >> n;
+            if (n > 0) {
+                dfa = generateDfa(n);
+                dfaNullFlag = false;
+            } else {
+                std::cout << "\nInvalid number of states.\n\n";
+            }
             break;
         default:
             quit = true;
@@ -200,7 +225,7 @@ void exportDfaToFile(DFA dfa) {
  * @return The minimized DFA
  */
 DFA minimizeWithON2Algorithm(DFA dfa) {
-    std::cout << "Running O(n^2) Algorithm\n";
+    return myOn2Algorithm(dfa);
 }
 
 /**
@@ -211,5 +236,25 @@ DFA minimizeWithON2Algorithm(DFA dfa) {
  * @return The minimized DFA
  */
 DFA minimizeWithONLogNAlgorithm(DFA dfa) {
-    std::cout << "Running O(n log n) Algorithm\n";
+    return blumOnLognAlgorithm(dfa);
+}
+
+/**
+ * @brief Generates a DFA with n states. The DFA forces the worst case to the O(n^2) algorithm.
+ * 
+ * @param n The number of states
+ * @return The generated DFA
+ */
+DFA generateDfa(int n) {
+    DFA dfa = DFA();
+    dfa.addSymbol("a");
+    for (int i = 0; i < n; i++) {
+        dfa.addState(std::to_string(i));
+    }
+    dfa.setInitialState("0");
+    dfa.addFinalState(std::to_string(n-1));
+    for (int i = 0; i < n; i++) {
+        dfa.addTransition(std::to_string(i), "a", std::to_string((i + 1) % n));
+    }
+    return dfa;
 }
